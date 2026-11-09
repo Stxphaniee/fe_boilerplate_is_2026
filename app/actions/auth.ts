@@ -68,7 +68,7 @@ export async function login(
   }
 
   await createSession(token);
-  redirect("/");
+  redirect("/equipos/inscripcion");
 }
 
 export async function logout() {

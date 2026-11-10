@@ -1,4 +1,3 @@
-
 export type TeamState =
   | "PENDIENTE_VALIDACION"
   | "APROBADO"
@@ -45,4 +44,9 @@ export interface TeamResponse {
   captainId: string;
   createdAt: string;
   players: PlayerResponse[];
+}
+
+export interface ResubmitTeamRequest {
+  name?: string;
+  players: CreatePlayerRequest[];
 }

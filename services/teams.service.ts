@@ -1,5 +1,15 @@
-import type { CreateTeamRequest, TeamResponse } from "@/types/teams.types";
+import type {
+  AddPlayerRequest,
+  CreateTeamRequest,
+  PlayerResponse,
+  ResubmitTeamRequest,
+  TeamResponse,
+} from "@/types/teams.types";
 import { apiRequest } from "@/lib/api/client";
+
+// ==========================================
+// H1 - INSCRIPCIÓN DE EQUIPOS
+// ==========================================
 
 /**
  * Registra un equipo en la temporada vigente.
@@ -24,7 +34,9 @@ export async function getMyTeam(): Promise<TeamResponse> {
   });
 }
 
-import type { ResubmitTeamRequest } from "@/types/teams.types";
+// ==========================================
+// H2 - CORRECCIÓN Y REENVÍO
+// ==========================================
 
 /**
  * Corrige y reenvía una inscripción rechazada.
@@ -38,4 +50,48 @@ export async function resubmitTeam(
     method: "PATCH",
     body: data,
   });
+}
+
+// ==========================================
+// H3 - GESTIÓN DE PLANTILLA
+// ==========================================
+
+/**
+ * Consulta los jugadores activos de la plantilla.
+ * GET /api/v1/teams/:id/players
+ */
+export async function getTeamPlayers(
+  teamId: string,
+): Promise<PlayerResponse[]> {
+  return apiRequest<PlayerResponse[]>(`teams/${teamId}/players`, {
+    method: "GET",
+  });
+}
+
+/**
+ * Agrega un jugador a la plantilla.
+ * POST /api/v1/teams/:id/players
+ */
+export async function addPlayer(
+  teamId: string,
+  data: AddPlayerRequest,
+): Promise<PlayerResponse> {
+  return apiRequest<PlayerResponse>(`teams/${teamId}/players`, {
+    method: "POST",
+    body: data,
+  });
+}
+
+/**
+ * Da de baja lógica a un jugador de la plantilla.
+ * PATCH /api/v1/teams/:id/players/:playerId/leave
+ */
+export async function removePlayer(
+  teamId: string,
+  playerId: string,
+): Promise<PlayerResponse> {
+  return apiRequest<PlayerResponse>(
+    `teams/${teamId}/players/${playerId}/leave`,
+    { method: "PATCH" },
+  );
 }

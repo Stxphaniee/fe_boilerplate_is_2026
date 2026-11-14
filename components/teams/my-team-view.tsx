@@ -3,6 +3,7 @@
 
 import { useMyTeamPage } from "@/hooks/use-my-team-page";
 import { TeamCorrectionForm } from "./team-correction-form";
+import { RosterManagementView } from "./roster-management-view";
 
 const STATUS_LABELS = {
   PENDIENTE_VALIDACION: "Pendiente de validación",
@@ -70,6 +71,8 @@ export function MyTeamView() {
 
   if (!team) return null;
 
+  const isApproved = team.status === "APROBADO";
+
   return (
     <main className="mx-auto w-full max-w-6xl space-y-6 px-4 py-8">
       <header>
@@ -111,7 +114,7 @@ export function MyTeamView() {
             className={`rounded-full px-4 py-2 text-xs font-semibold ${
               team.status === "RECHAZADO"
                 ? "bg-red-50 text-red-700"
-                : team.status === "APROBADO"
+                : isApproved
                   ? "bg-green-50 text-green-700"
                   : "bg-blue-50 text-blue-700"
             }`}
@@ -181,6 +184,8 @@ export function MyTeamView() {
           isSubmitting={isSubmitting}
           error={validationError}
         />
+      ) : isApproved ? (
+        <RosterManagementView />
       ) : (
         <section className="overflow-hidden rounded-lg border border-[#d8e3f0] bg-white">
           <div className="bg-[#eaf3ff] px-5 py-4">

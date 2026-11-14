@@ -25,6 +25,7 @@ export interface PlayerResponse {
   birthDate: string;
   position: PlayerPosition;
   jerseyNumber: number;
+  leftAt?: string | null;
 }
 
 export interface CreateTeamRequest {
@@ -49,4 +50,16 @@ export interface TeamResponse {
 export interface ResubmitTeamRequest {
   name?: string;
   players: CreatePlayerRequest[];
+}
+
+// ==========================================
+// H3 - GESTIÓN DE PLANTILLA
+// ==========================================
+
+export interface AddPlayerRequest {
+  name: string;
+  dui: string;
+  birthDate: string;
+  position: PlayerPosition;
+  jerseyNumber: number;
 }

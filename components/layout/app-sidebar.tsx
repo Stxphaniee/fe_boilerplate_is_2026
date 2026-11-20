@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -16,20 +15,26 @@ import {
   ClipboardCheck,
   ShieldCheck,
   ImageIcon,
+  Radio,
 } from "lucide-react";
 
 type AppSidebarProps = {
-  role?: "CAPITAN" | "ORGANIZADOR" | "JUGADOR";
+  role?:
+    | "CAPITAN"
+    | "ORGANIZADOR"
+    | "JUGADOR"
+    | "ARBITRO";
 };
 
 const ROLE_LABELS = {
   CAPITAN: "Capitán",
   ORGANIZADOR: "Organizador",
   JUGADOR: "Jugador",
+  ARBITRO: "Árbitro",
 } as const;
 
 // =====================================================
-// NAVEGACIÓN DEL CAPITÁN
+// NAVEGACION DEL CAPITAN
 // =====================================================
 
 const captainNavigation = [
@@ -76,7 +81,7 @@ const captainNavigation = [
 ];
 
 // =====================================================
-// NAVEGACIÓN DEL ORGANIZADOR
+// NAVEGACION DEL ORGANIZADOR
 // =====================================================
 
 const organizerNavigation = [
@@ -123,7 +128,7 @@ const organizerNavigation = [
 ];
 
 // =====================================================
-// NAVEGACIÓN DEL JUGADOR - HU6
+// NAVEGACION DEL JUGADOR - HU6
 // =====================================================
 
 const playerNavigation = [
@@ -165,6 +170,42 @@ const playerNavigation = [
 ];
 
 // =====================================================
+// NAVEGACION DEL ARBITRO - HU7
+// =====================================================
+
+function getRefereeNavigation(
+  currentMatchPath: string,
+) {
+  return [
+    {
+      label: "Inicio",
+      icon: LayoutDashboard,
+      href: "/",
+    },
+    {
+      label: "Mis partidos",
+      icon: CalendarDays,
+      href: "/arbitro/partidos",
+    },
+    {
+      label: "Marcador en vivo",
+      icon: Radio,
+      href: currentMatchPath,
+    },
+    {
+      label: "Resultados",
+      icon: Target,
+      href: "#",
+    },
+    {
+      label: "Notificaciones",
+      icon: Bell,
+      href: "#",
+    },
+  ];
+}
+
+// =====================================================
 // SIDEBAR PRINCIPAL
 // =====================================================
 
@@ -173,17 +214,36 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const pathname = usePathname();
 
-  const isOrganizer = role === "ORGANIZADOR";
+  const isOrganizer =
+    role === "ORGANIZADOR";
+
+  const isRefereePanel =
+    pathname.startsWith(
+      "/arbitro/partidos/",
+    );
+
+  const isPersonalCalendarRoute =
+    pathname === "/mi-equipo/calendario" ||
+    pathname.startsWith(
+      "/mi-equipo/calendario/",
+    );
 
   const navigation =
     role === "ORGANIZADOR"
       ? organizerNavigation
       : role === "JUGADOR"
         ? playerNavigation
-        : captainNavigation;
+        : role === "ARBITRO"
+          ? getRefereeNavigation(
+              isRefereePanel
+                ? pathname
+                : "/arbitro/partidos",
+            )
+          : captainNavigation;
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 flex w-[200px] flex-col bg-[#102342] text-white">
+
       {/* Identidad de la liga */}
       <div className="flex h-[78px] items-center gap-3 border-b border-white/10 px-5">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-white">
@@ -201,7 +261,7 @@ export function AppSidebar({
         </div>
       </div>
 
-      {/* Navegación por rol */}
+      {/* Navegacion por rol */}
       <nav className="flex-1 space-y-2 overflow-y-auto px-2 py-8">
         {navigation.map((item) => {
           const Icon = item.icon;
@@ -209,21 +269,15 @@ export function AppSidebar({
           const isOrganizerMatchesRoute =
             isOrganizer &&
             item.label === "Calendario" &&
-            pathname.startsWith("/admin/partidos");
-
-          // Evita marcar Mi Equipo y Calendario
-          // simultáneamente en la navegación del capitán.
-          const isPersonalCalendarRoute =
-            pathname === "/mi-equipo/calendario" ||
             pathname.startsWith(
-              "/mi-equipo/calendario/",
+              "/admin/partidos",
             );
 
           const isExcludedTeamRoute =
             item.href === "/mi-equipo" &&
             isPersonalCalendarRoute;
 
-          const active =
+          let active =
             !isExcludedTeamRoute &&
             (
               isOrganizerMatchesRoute ||
@@ -241,6 +295,23 @@ export function AppSidebar({
               )
             );
 
+          // Distinguir la lista del arbitro
+          // de su panel de control.
+          if (
+            role === "ARBITRO" &&
+            item.label === "Mis partidos"
+          ) {
+            active =
+              pathname === "/arbitro/partidos";
+          }
+
+          if (
+            role === "ARBITRO" &&
+            item.label === "Marcador en vivo"
+          ) {
+            active = isRefereePanel;
+          }
+
           const itemClassName =
             `flex items-center gap-3 rounded-md px-3 py-3 text-[12px] transition-colors ${
               active
@@ -248,9 +319,14 @@ export function AppSidebar({
                 : "text-slate-300 hover:bg-white/10 hover:text-white"
             }`;
 
-          // Las funcionalidades pendientes del jugador
-          // se muestran, pero no conducen a rutas inexistentes.
-          if (role === "JUGADOR" && item.href === "#") {
+          // Funcionalidades pendientes.
+          if (
+            (
+              role === "JUGADOR" ||
+              role === "ARBITRO"
+            ) &&
+            item.href === "#"
+          ) {
             return (
               <span
                 key={item.label}
@@ -273,7 +349,9 @@ export function AppSidebar({
               key={item.label}
               href={item.href}
               aria-current={
-                active ? "page" : undefined
+                active
+                  ? "page"
+                  : undefined
               }
               className={itemClassName}
             >

@@ -1,16 +1,23 @@
-
-import { Users, ShieldCheck } from "lucide-react";
+import {
+  Users,
+  ShieldCheck,
+} from "lucide-react";
 
 type AppHeaderProps = {
   title: string;
   description: string;
-  role?: "CAPITAN" | "ORGANIZADOR" | "JUGADOR";
+  role?:
+    | "CAPITAN"
+    | "ORGANIZADOR"
+    | "JUGADOR"
+    | "ARBITRO";
 };
 
 const ROLE_LABELS = {
   CAPITAN: "Capitán",
   ORGANIZADOR: "Organizador",
   JUGADOR: "Jugador",
+  ARBITRO: "Árbitro",
 } as const;
 
 export function AppHeader({
@@ -18,13 +25,15 @@ export function AppHeader({
   description,
   role = "CAPITAN",
 }: AppHeaderProps) {
-  const isOrganizer = role === "ORGANIZADOR";
+  const useUsersIcon =
+    role === "ORGANIZADOR" ||
+    role === "JUGADOR";
 
   return (
     <header className="flex min-h-[96px] items-center justify-between border-b border-[#e1e8f0] bg-white px-7 py-4">
       <div className="flex items-center gap-4">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#eaf3ff] text-[#1457c5]">
-          {isOrganizer || role === "JUGADOR" ? (
+          {useUsersIcon ? (
             <Users size={23} />
           ) : (
             <ShieldCheck size={23} />

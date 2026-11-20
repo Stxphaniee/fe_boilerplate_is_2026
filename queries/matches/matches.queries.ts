@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 
 import {
@@ -5,6 +6,7 @@ import {
   getAvailableTeams,
   getReferees,
   getRoundMatches,
+  getMatchForEdit,
 } from "@/services/matches.service";
 
 export const matchKeys = {
@@ -20,6 +22,9 @@ export const matchKeys = {
 
   roundMatches: (roundId: string) =>
     [...matchKeys.all, "round-matches", roundId] as const,
+
+  matchForEdit: (matchId: string) =>
+    [...matchKeys.all, "edit", matchId] as const,
 };
 
 /**
@@ -74,5 +79,26 @@ export function useRoundMatchesQuery(
     enabled: enabled && !!roundId,
     retry: false,
     staleTime: 30_000,
+  });
+}
+
+/**
+ * Consulta la información necesaria para editar un partido.
+ * Reutiliza las consultas de jornadas y partidos existentes.
+ */
+export function useMatchForEditQuery(
+  matchId: string,
+  preferredRoundId?: string,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: [
+      ...matchKeys.matchForEdit(matchId),
+      preferredRoundId ?? null,
+    ],
+    queryFn: () => getMatchForEdit(matchId, preferredRoundId),
+    enabled: enabled && !!matchId,
+    retry: false,
+    staleTime: 0,
   });
 }

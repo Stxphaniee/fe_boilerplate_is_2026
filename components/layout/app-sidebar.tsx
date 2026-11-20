@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import {
   LayoutDashboard,
   Users,
@@ -77,7 +78,7 @@ const organizerNavigation = [
   {
     label: "Calendario",
     icon: CalendarDays,
-    href: "#",
+    href: "/admin/partidos/nuevo",
   },
   {
     label: "Resultados",
@@ -139,12 +140,22 @@ export function AppSidebar({
         {navigation.map((item) => {
           const Icon = item.icon;
 
+          const isOrganizerMatchesRoute =
+            isOrganizer &&
+            item.label === "Calendario" &&
+            pathname.startsWith("/admin/partidos");
+
           const active =
-            item.href !== "#" &&
+            isOrganizerMatchesRoute ||
             (
-              pathname === item.href ||
-              (item.href !== "/" &&
-                pathname.startsWith(`${item.href}/`))
+              item.href !== "#" &&
+              (
+                pathname === item.href ||
+                (
+                  item.href !== "/" &&
+                  pathname.startsWith(`${item.href}/`)
+                )
+              )
             );
 
           return (

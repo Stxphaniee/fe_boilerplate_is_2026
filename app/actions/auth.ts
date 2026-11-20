@@ -1,4 +1,3 @@
-
 "use server";
 
 import { redirect } from "next/navigation";
@@ -30,10 +29,11 @@ interface LoginApiResponse {
   user?: AuthUser;
 }
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_REGEX =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // =====================================================
-// AUTENTICACIÓN CON EL BACKEND
+// AUTENTICACION CON EL BACKEND
 // =====================================================
 
 async function authenticate(
@@ -69,7 +69,10 @@ async function authenticate(
     },
   );
 
-  if (res.status === 401 || res.status === 403) {
+  if (
+    res.status === 401 ||
+    res.status === 403
+  ) {
     return null;
   }
 
@@ -79,7 +82,8 @@ async function authenticate(
     );
   }
 
-  const data: LoginApiResponse = await res.json();
+  const data: LoginApiResponse =
+    await res.json();
 
   const token =
     data.token ??
@@ -99,7 +103,7 @@ async function authenticate(
 }
 
 // =====================================================
-// INICIO DE SESIÓN
+// INICIO DE SESION
 // =====================================================
 
 export async function login(
@@ -128,7 +132,9 @@ export async function login(
     };
   }
 
-  let authentication: AuthenticationResult | null;
+  let authentication:
+    | AuthenticationResult
+    | null;
 
   try {
     authentication = await authenticate(
@@ -150,29 +156,32 @@ export async function login(
 
   if (!authentication) {
     return {
-      error:
-        "Correo o contraseña incorrectos.",
+      error: "Correo o contraseña incorrectos.",
       email,
     };
   }
 
-  // El token continúa almacenándose exclusivamente
-  // en la cookie httpOnly del servidor.
-  await createSession(authentication.token);
+  // La sesion permanece en la cookie httpOnly.
+  await createSession(
+    authentication.token,
+  );
 
-  // HU6 - Los jugadores ingresan directamente
-  // al calendario de partidos de su equipo.
+  // HU6 - Calendario del jugador.
   if (authentication.role === "JUGADOR") {
     redirect("/mi-equipo/calendario");
   }
 
-  // Conservamos el comportamiento anterior
-  // para los demás roles.
+  // HU7 - Partidos asignados al arbitro.
+  if (authentication.role === "ARBITRO") {
+    redirect("/arbitro/partidos");
+  }
+
+  // Comportamiento existente de los demas roles.
   redirect("/equipos/inscripcion");
 }
 
 // =====================================================
-// CIERRE DE SESIÓN
+// CIERRE DE SESION
 // =====================================================
 
 export async function logout() {

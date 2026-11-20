@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -23,7 +24,8 @@ type AppSidebarProps = {
     | "CAPITAN"
     | "ORGANIZADOR"
     | "JUGADOR"
-    | "ARBITRO";
+    | "ARBITRO"
+    | "PUBLICO";
 };
 
 const ROLE_LABELS = {
@@ -31,6 +33,7 @@ const ROLE_LABELS = {
   ORGANIZADOR: "Organizador",
   JUGADOR: "Jugador",
   ARBITRO: "Árbitro",
+  PUBLICO: "Público",
 } as const;
 
 // =====================================================
@@ -61,7 +64,7 @@ const captainNavigation = [
   {
     label: "Resultados",
     icon: Target,
-    href: "#",
+    href: "/resultados",
   },
   {
     label: "Tabla de posiciones",
@@ -103,7 +106,7 @@ const organizerNavigation = [
   {
     label: "Resultados",
     icon: Target,
-    href: "#",
+    href: "/resultados",
   },
   {
     label: "Ranking",
@@ -128,7 +131,7 @@ const organizerNavigation = [
 ];
 
 // =====================================================
-// NAVEGACION DEL JUGADOR - HU6
+// NAVEGACION DEL JUGADOR
 // =====================================================
 
 const playerNavigation = [
@@ -145,7 +148,7 @@ const playerNavigation = [
   {
     label: "Resultados",
     icon: Target,
-    href: "#",
+    href: "/resultados",
   },
   {
     label: "Tabla de posiciones",
@@ -170,7 +173,7 @@ const playerNavigation = [
 ];
 
 // =====================================================
-// NAVEGACION DEL ARBITRO - HU7
+// NAVEGACION DEL ARBITRO
 // =====================================================
 
 function getRefereeNavigation(
@@ -195,7 +198,7 @@ function getRefereeNavigation(
     {
       label: "Resultados",
       icon: Target,
-      href: "#",
+      href: "/resultados",
     },
     {
       label: "Notificaciones",
@@ -204,6 +207,33 @@ function getRefereeNavigation(
     },
   ];
 }
+
+// =====================================================
+// NAVEGACION PUBLICA - HU8
+// =====================================================
+
+const publicNavigation = [
+  {
+    label: "Inicio",
+    icon: LayoutDashboard,
+    href: "/resultados",
+  },
+  {
+    label: "Resultados",
+    icon: Target,
+    href: "/resultados",
+  },
+  {
+    label: "Tabla de posiciones",
+    icon: Trophy,
+    href: "#",
+  },
+  {
+    label: "Galería",
+    icon: ImageIcon,
+    href: "#",
+  },
+];
 
 // =====================================================
 // SIDEBAR PRINCIPAL
@@ -228,22 +258,27 @@ export function AppSidebar({
       "/mi-equipo/calendario/",
     );
 
+  // =====================================================
+  // OBTENER NAVEGACION SEGUN EL ROL
+  // =====================================================
+
   const navigation =
-    role === "ORGANIZADOR"
-      ? organizerNavigation
-      : role === "JUGADOR"
-        ? playerNavigation
-        : role === "ARBITRO"
-          ? getRefereeNavigation(
-              isRefereePanel
-                ? pathname
-                : "/arbitro/partidos",
-            )
-          : captainNavigation;
+    role === "PUBLICO"
+      ? publicNavigation
+      : role === "ORGANIZADOR"
+        ? organizerNavigation
+        : role === "JUGADOR"
+          ? playerNavigation
+          : role === "ARBITRO"
+            ? getRefereeNavigation(
+                isRefereePanel
+                  ? pathname
+                  : "/arbitro/partidos",
+              )
+            : captainNavigation;
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 flex w-[200px] flex-col bg-[#102342] text-white">
-
       {/* Identidad de la liga */}
       <div className="flex h-[78px] items-center gap-3 border-b border-white/10 px-5">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-white">
@@ -261,11 +296,12 @@ export function AppSidebar({
         </div>
       </div>
 
-      {/* Navegacion por rol */}
+      {/* Menú */}
       <nav className="flex-1 space-y-2 overflow-y-auto px-2 py-8">
         {navigation.map((item) => {
           const Icon = item.icon;
 
+          // Calendario del organizador
           const isOrganizerMatchesRoute =
             isOrganizer &&
             item.label === "Calendario" &&
@@ -273,6 +309,8 @@ export function AppSidebar({
               "/admin/partidos",
             );
 
+          // Evitar activar "Mi Equipo"
+          // cuando estamos en el calendario.
           const isExcludedTeamRoute =
             item.href === "/mi-equipo" &&
             isPersonalCalendarRoute;
@@ -295,8 +333,8 @@ export function AppSidebar({
               )
             );
 
-          // Distinguir la lista del arbitro
-          // de su panel de control.
+          // Diferenciar listado de partidos
+          // y panel del árbitro.
           if (
             role === "ARBITRO" &&
             item.label === "Mis partidos"
@@ -312,6 +350,15 @@ export function AppSidebar({
             active = isRefereePanel;
           }
 
+          // HU8 - Solo "Resultados" aparece activo
+          // dentro de la navegación pública.
+          if (
+            role === "PUBLICO" &&
+            item.label === "Inicio"
+          ) {
+            active = false;
+          }
+
           const itemClassName =
             `flex items-center gap-3 rounded-md px-3 py-3 text-[12px] transition-colors ${
               active
@@ -319,14 +366,9 @@ export function AppSidebar({
                 : "text-slate-300 hover:bg-white/10 hover:text-white"
             }`;
 
-          // Funcionalidades pendientes.
-          if (
-            (
-              role === "JUGADOR" ||
-              role === "ARBITRO"
-            ) &&
-            item.href === "#"
-          ) {
+          // Las funcionalidades futuras se
+          // muestran sin permitir navegación.
+          if (item.href === "#") {
             return (
               <span
                 key={item.label}
@@ -339,7 +381,9 @@ export function AppSidebar({
                   className="shrink-0"
                 />
 
-                <span>{item.label}</span>
+                <span>
+                  {item.label}
+                </span>
               </span>
             );
           }
@@ -360,13 +404,15 @@ export function AppSidebar({
                 className="shrink-0"
               />
 
-              <span>{item.label}</span>
+              <span>
+                {item.label}
+              </span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Perfil del usuario */}
+      {/* Perfil */}
       <div className="m-3 rounded-lg border border-white/15 bg-white/5 p-3">
         <div className="flex items-center gap-3">
           <ClipboardCheck size={21} />

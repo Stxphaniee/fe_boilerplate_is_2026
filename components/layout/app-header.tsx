@@ -1,3 +1,4 @@
+
 import {
   Users,
   ShieldCheck,
@@ -10,7 +11,8 @@ type AppHeaderProps = {
     | "CAPITAN"
     | "ORGANIZADOR"
     | "JUGADOR"
-    | "ARBITRO";
+    | "ARBITRO"
+    | "PUBLICO";
 };
 
 const ROLE_LABELS = {
@@ -18,6 +20,7 @@ const ROLE_LABELS = {
   ORGANIZADOR: "Organizador",
   JUGADOR: "Jugador",
   ARBITRO: "Árbitro",
+  PUBLICO: "Público",
 } as const;
 
 export function AppHeader({

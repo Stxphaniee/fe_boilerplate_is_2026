@@ -15,11 +15,22 @@ import {
   BarChart3,
   ClipboardCheck,
   ShieldCheck,
+  ImageIcon,
 } from "lucide-react";
 
 type AppSidebarProps = {
-  role?: "CAPITAN" | "ORGANIZADOR";
+  role?: "CAPITAN" | "ORGANIZADOR" | "JUGADOR";
 };
+
+const ROLE_LABELS = {
+  CAPITAN: "Capitán",
+  ORGANIZADOR: "Organizador",
+  JUGADOR: "Jugador",
+} as const;
+
+// =====================================================
+// NAVEGACIÓN DEL CAPITÁN
+// =====================================================
 
 const captainNavigation = [
   {
@@ -40,7 +51,7 @@ const captainNavigation = [
   {
     label: "Calendario",
     icon: CalendarDays,
-    href: "#",
+    href: "/mi-equipo/calendario",
   },
   {
     label: "Resultados",
@@ -63,6 +74,10 @@ const captainNavigation = [
     href: "#",
   },
 ];
+
+// =====================================================
+// NAVEGACIÓN DEL ORGANIZADOR
+// =====================================================
 
 const organizerNavigation = [
   {
@@ -107,6 +122,52 @@ const organizerNavigation = [
   },
 ];
 
+// =====================================================
+// NAVEGACIÓN DEL JUGADOR - HU6
+// =====================================================
+
+const playerNavigation = [
+  {
+    label: "Inicio",
+    icon: LayoutDashboard,
+    href: "/",
+  },
+  {
+    label: "Calendario",
+    icon: CalendarDays,
+    href: "/mi-equipo/calendario",
+  },
+  {
+    label: "Resultados",
+    icon: Target,
+    href: "#",
+  },
+  {
+    label: "Tabla de posiciones",
+    icon: Trophy,
+    href: "#",
+  },
+  {
+    label: "Estadísticas",
+    icon: BarChart3,
+    href: "#",
+  },
+  {
+    label: "Galería",
+    icon: ImageIcon,
+    href: "#",
+  },
+  {
+    label: "Notificaciones",
+    icon: Bell,
+    href: "#",
+  },
+];
+
+// =====================================================
+// SIDEBAR PRINCIPAL
+// =====================================================
+
 export function AppSidebar({
   role = "CAPITAN",
 }: AppSidebarProps) {
@@ -114,14 +175,18 @@ export function AppSidebar({
 
   const isOrganizer = role === "ORGANIZADOR";
 
-  const navigation = isOrganizer
-    ? organizerNavigation
-    : captainNavigation;
+  const navigation =
+    role === "ORGANIZADOR"
+      ? organizerNavigation
+      : role === "JUGADOR"
+        ? playerNavigation
+        : captainNavigation;
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 flex w-[200px] flex-col bg-[#102342] text-white">
+      {/* Identidad de la liga */}
       <div className="flex h-[78px] items-center gap-3 border-b border-white/10 px-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-white">
           <ShieldCheck size={21} />
         </div>
 
@@ -136,6 +201,7 @@ export function AppSidebar({
         </div>
       </div>
 
+      {/* Navegación por rol */}
       <nav className="flex-1 space-y-2 overflow-y-auto px-2 py-8">
         {navigation.map((item) => {
           const Icon = item.icon;
@@ -145,44 +211,91 @@ export function AppSidebar({
             item.label === "Calendario" &&
             pathname.startsWith("/admin/partidos");
 
+          // Evita marcar Mi Equipo y Calendario
+          // simultáneamente en la navegación del capitán.
+          const isPersonalCalendarRoute =
+            pathname === "/mi-equipo/calendario" ||
+            pathname.startsWith(
+              "/mi-equipo/calendario/",
+            );
+
+          const isExcludedTeamRoute =
+            item.href === "/mi-equipo" &&
+            isPersonalCalendarRoute;
+
           const active =
-            isOrganizerMatchesRoute ||
+            !isExcludedTeamRoute &&
             (
-              item.href !== "#" &&
+              isOrganizerMatchesRoute ||
               (
-                pathname === item.href ||
+                item.href !== "#" &&
                 (
-                  item.href !== "/" &&
-                  pathname.startsWith(`${item.href}/`)
+                  pathname === item.href ||
+                  (
+                    item.href !== "/" &&
+                    pathname.startsWith(
+                      `${item.href}/`,
+                    )
+                  )
                 )
               )
             );
+
+          const itemClassName =
+            `flex items-center gap-3 rounded-md px-3 py-3 text-[12px] transition-colors ${
+              active
+                ? "bg-[#294b7d] font-semibold text-white"
+                : "text-slate-300 hover:bg-white/10 hover:text-white"
+            }`;
+
+          // Las funcionalidades pendientes del jugador
+          // se muestran, pero no conducen a rutas inexistentes.
+          if (role === "JUGADOR" && item.href === "#") {
+            return (
+              <span
+                key={item.label}
+                aria-disabled="true"
+                title="Funcionalidad próximamente disponible"
+                className="flex cursor-not-allowed items-center gap-3 rounded-md px-3 py-3 text-[12px] text-slate-300 opacity-70"
+              >
+                <Icon
+                  size={17}
+                  className="shrink-0"
+                />
+
+                <span>{item.label}</span>
+              </span>
+            );
+          }
 
           return (
             <Link
               key={item.label}
               href={item.href}
-              aria-current={active ? "page" : undefined}
-              className={`flex items-center gap-3 rounded-md px-3 py-3 text-[12px] transition-colors ${
-                active
-                  ? "bg-[#294b7d] font-semibold text-white"
-                  : "text-slate-300 hover:bg-white/10 hover:text-white"
-              }`}
+              aria-current={
+                active ? "page" : undefined
+              }
+              className={itemClassName}
             >
-              <Icon size={17} className="shrink-0" />
+              <Icon
+                size={17}
+                className="shrink-0"
+              />
+
               <span>{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
+      {/* Perfil del usuario */}
       <div className="m-3 rounded-lg border border-white/15 bg-white/5 p-3">
         <div className="flex items-center gap-3">
           <ClipboardCheck size={21} />
 
           <div>
             <p className="text-xs font-semibold">
-              {isOrganizer ? "Organizador" : "Capitán"}
+              {ROLE_LABELS[role]}
             </p>
 
             <p className="text-[10px] text-slate-400">

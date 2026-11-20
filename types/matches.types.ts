@@ -1,13 +1,19 @@
-export type RoundState = 'BORRADOR' | 'PUBLICADA';
+
+export type RoundState = "BORRADOR" | "PUBLICADA";
 
 export type MatchState =
-  | 'PROGRAMADO'
-  | 'EN_CURSO'
-  | 'FINALIZADO'
-  | 'SUSPENDIDO'
-  | 'CANCELADO';
+  | "PROGRAMADO"
+  | "EN_CURSO"
+  | "FINALIZADO"
+  | "SUSPENDIDO"
+  | "CANCELADO";
 
-export type CourtOption = 'A' | 'B' | 'C';
+export type CourtOption = "A" | "B" | "C";
+
+export type MatchUpdateAction =
+  | "PROGRAMADO"
+  | "SUSPENDIDO"
+  | "CANCELADO";
 
 export interface RoundResponse {
   id: string;
@@ -44,14 +50,24 @@ export interface CreateMatchRequest {
   fechaHoraInicio: string;
 }
 
+export interface UpdateMatchRequest {
+  fechaHoraInicio?: string;
+  cancha?: CourtOption;
+  estado?: MatchUpdateAction;
+  motivoSuspension?: string;
+}
+
+export interface MatchEditData {
+  match: MatchResponse;
+  jornadaNumero: number;
+  equipoLocalNombre: string;
+  equipoVisitanteNombre: string;
+  arbitroNombre: string;
+}
+
 export interface TeamOption {
   id: string;
   name: string;
-}
-
-export interface RefereeOption {
-  id: string;
-  email: string;
 }
 
 export interface AvailableTeamOption {

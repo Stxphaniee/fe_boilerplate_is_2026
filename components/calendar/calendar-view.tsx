@@ -10,14 +10,34 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-import { AppHeader } from "@/components/layout/app-header";
-import { AppSidebar } from "@/components/layout/app-sidebar";
+import {
+  AppHeader,
+} from "@/components/layout/app-header";
 
-import { CalendarStats } from "./calendar-stats";
-import { CalendarMatchesTable } from "./calendar-matches-table";
+import {
+  AppSidebar,
+} from "@/components/layout/app-sidebar";
 
-import { useMyCalendar } from "@/hooks/use-my-calendar";
-import { ApiError, getErrorMessage } from "@/lib/api/errors";
+import {
+  CalendarStats,
+} from "./calendar-stats";
+
+import {
+  CalendarMatchesTable,
+} from "./calendar-matches-table";
+
+import {
+  useMyCalendar,
+} from "@/hooks/use-my-calendar";
+
+import {
+  ApiError,
+  getErrorMessage,
+} from "@/lib/api/errors";
+
+// =====================================================
+// ESTADO DE CARGA
+// =====================================================
 
 function CalendarLoading() {
   return (
@@ -34,6 +54,10 @@ function CalendarLoading() {
     </section>
   );
 }
+
+// =====================================================
+// ESTADO DE ERROR
+// =====================================================
 
 interface CalendarErrorProps {
   title: string;
@@ -72,16 +96,24 @@ function CalendarError({
         className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#1457c5] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#1049a8]"
       >
         <RefreshCw size={14} />
+
         Intentar nuevamente
       </button>
     </section>
   );
 }
 
+// =====================================================
+// PANTALLA DEL CALENDARIO - HU6
+// =====================================================
+
 export function CalendarView() {
   const calendar = useMyCalendar();
 
-  // Validación inicial de la identidad del usuario.
+  // =====================================================
+  // VALIDACION DE IDENTIDAD
+  // =====================================================
+
   if (calendar.isUserLoading) {
     return (
       <main className="mx-auto w-full max-w-3xl p-6">
@@ -95,15 +127,21 @@ export function CalendarView() {
       <main className="mx-auto w-full max-w-3xl p-6">
         <CalendarError
           title="No fue posible verificar tu sesión"
-          message={getErrorMessage(calendar.userError)}
-          onRetry={() => void calendar.refetchUser()}
+          message={getErrorMessage(
+            calendar.userError,
+          )}
+          onRetry={() =>
+            void calendar.refetchUser()
+          }
         />
       </main>
     );
   }
 
-  // Solamente los jugadores y capitanes pueden
-  // consultar el calendario personal.
+  // =====================================================
+  // PERMISOS DEL CALENDARIO
+  // =====================================================
+
   if (!calendar.role) {
     return (
       <main className="mx-auto w-full max-w-3xl p-6">
@@ -117,8 +155,9 @@ export function CalendarView() {
           </h1>
 
           <p className="mt-3 max-w-md text-sm text-[#7184a3]">
-            Esta pantalla está disponible exclusivamente
-            para jugadores y capitanes de la liga.
+            Esta pantalla está disponible
+            exclusivamente para jugadores
+            y capitanes de la liga.
           </p>
 
           <Link
@@ -132,6 +171,10 @@ export function CalendarView() {
     );
   }
 
+  // =====================================================
+  // DATOS Y ESTADOS
+  // =====================================================
+
   const isForbidden =
     calendar.calendarError instanceof ApiError &&
     calendar.calendarError.status === 403;
@@ -139,16 +182,15 @@ export function CalendarView() {
   const lastUpdate =
     calendar.updatedAt > 0 &&
     calendar.isCalendarSuccess
-      ? new Date(calendar.updatedAt).toLocaleTimeString(
-          "es-SV",
-          {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hourCycle: "h23",
-            timeZone: "America/El_Salvador",
-          },
-        )
+      ? new Date(
+          calendar.updatedAt,
+        ).toLocaleTimeString("es-SV", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hourCycle: "h23",
+          timeZone: "America/El_Salvador",
+        })
       : null;
 
   return (
@@ -170,7 +212,7 @@ export function CalendarView() {
             hasData={calendar.isCalendarSuccess}
           />
 
-          {/* Calendario */}
+          {/* Calendario de partidos */}
           {calendar.isCalendarLoading ? (
             <CalendarLoading />
           ) : calendar.isCalendarError ? (
@@ -257,15 +299,13 @@ export function CalendarView() {
               /mi-equipo/calendario
             </p>
 
-            {/* Se habilitará al implementar HU8. */}
-            <button
-              type="button"
-              disabled
-              title="Disponible al implementar HU8"
-              className="min-w-[190px] rounded-lg bg-[#1457c5] px-5 py-3 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+            {/* HU8 - Consulta pública habilitada */}
+            <Link
+              href="/resultados"
+              className="inline-flex min-w-[190px] items-center justify-center rounded-lg bg-[#1457c5] px-5 py-3 text-xs font-semibold text-white transition hover:bg-[#1049a8]"
             >
               Consultar resultados
-            </button>
+            </Link>
           </div>
         </main>
       </div>

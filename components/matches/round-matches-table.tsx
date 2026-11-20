@@ -1,11 +1,15 @@
-'use client';
 
-import type { MatchResponse } from '@/types/matches.types';
+"use client";
+
+import Link from "next/link";
+import { Pencil } from "lucide-react";
+
+import type { MatchResponse } from "@/types/matches.types";
 
 const COURT_LABELS: Record<string, string> = {
-  A: 'A · Sintética',
-  B: 'B · Grama',
-  C: 'C · Techada',
+  A: "A · Sintética",
+  B: "B · Grama",
+  C: "C · Techada",
 };
 
 interface RoundMatchesTableProps {
@@ -51,6 +55,10 @@ export function RoundMatchesTable({
             <th className="px-4 py-3 text-left font-medium text-gray-500">
               Estado
             </th>
+
+            <th className="px-4 py-3 text-left font-medium text-gray-500">
+              Acciones
+            </th>
           </tr>
         </thead>
 
@@ -70,12 +78,17 @@ export function RoundMatchesTable({
 
             const date = new Date(match.fechaHoraInicio);
 
-            const dateLabel = date.toLocaleString('es-SV', {
-              day: '2-digit',
-              month: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
+            const dateLabel = date.toLocaleString("es-SV", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
             });
+
+            const canEdit =
+              match.estado === "PROGRAMADO" ||
+              match.estado === "SUSPENDIDO";
 
             return (
               <tr
@@ -102,6 +115,22 @@ export function RoundMatchesTable({
                   <span className="inline-block rounded bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">
                     {match.estado}
                   </span>
+                </td>
+
+                <td className="px-4 py-3">
+                  {canEdit ? (
+                    <Link
+                      href={`/admin/partidos/${match.id}/editar?jornadaId=${encodeURIComponent(match.jornadaId)}`}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-[#cbd8e8] px-3 py-2 text-xs font-semibold text-[#1457c5] transition hover:border-[#1457c5] hover:bg-[#eaf3ff]"
+                    >
+                      <Pencil size={13} />
+                      Editar
+                    </Link>
+                  ) : (
+                    <span className="text-xs text-gray-400">
+                      No editable
+                    </span>
+                  )}
                 </td>
               </tr>
             );

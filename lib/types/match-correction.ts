@@ -33,6 +33,6 @@ export interface CorrectionPayload {
   eventosCorregidos: Array<{
     playerId: string;
     minute: number;
-    type: 'GOL';
+    type: "GOL";
   }>;
 }

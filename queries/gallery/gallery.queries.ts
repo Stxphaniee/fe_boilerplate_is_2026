@@ -1,5 +1,9 @@
-﻿import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getMatchGallery, uploadMatchMedia } from "@/services/gallery.service";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  getMatchGallery,
+  getPublicMatchGallery,
+  uploadMatchMedia,
+} from "@/services/gallery.service";
 
 export const galleryKeys = {
   all: ["gallery"] as const,
@@ -25,5 +29,19 @@ export function useUploadMatchMediaMutation(
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: galleryKeys.match(matchId) });
     },
+  });
+}
+
+export const publicGalleryKeys = {
+  all: ["public-gallery"] as const,
+  match: (matchId: string) => [...publicGalleryKeys.all, matchId] as const,
+};
+
+export function usePublicMatchGalleryQuery(matchId: string) {
+  return useQuery({
+    queryKey: publicGalleryKeys.match(matchId),
+    queryFn: () => getPublicMatchGallery(matchId),
+    enabled: Boolean(matchId),
+    retry: false,
   });
 }

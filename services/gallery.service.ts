@@ -1,5 +1,9 @@
-﻿import { apiRequest } from "@/lib/api/client";
-import type { MatchMediaItem, UploadMatchMediaResponse } from "@/types/gallery.types";
+import { apiRequest } from "@/lib/api/client";
+import type {
+  MatchGalleryPayload,
+  MatchMediaItem,
+  UploadMatchMediaResponse,
+} from "@/types/gallery.types";
 
 const MAX_FILES_PER_MATCH = 20;
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
@@ -92,4 +96,31 @@ export async function uploadMatchMedia(
   }
   const typed = payload as UploadMatchMediaResponse | undefined;
   return Array.isArray(typed?.items) ? typed.items : [];
+}
+
+export async function getPublicMatchGallery(
+  matchId: string,
+): Promise<MatchGalleryPayload> {
+  const res = await apiRequest<
+    | MatchMediaItem[]
+    | (Partial<MatchGalleryPayload> & { items?: MatchMediaItem[]; media?: MatchMediaItem[] })
+  >(`partidos/${matchId}/galeria`, { method: "GET" });
+
+  if (Array.isArray(res)) {
+    return { items: res };
+  }
+
+  const rawItems = Array.isArray(res?.items)
+    ? res.items
+    : Array.isArray(res?.media)
+      ? res.media
+      : [];
+
+  return {
+    partidoId: typeof res?.partidoId === "string" ? res.partidoId : matchId,
+    estado: typeof res?.estado === "string" ? res.estado : "FINALIZADO",
+    marcador: typeof res?.marcador === "string" ? res.marcador : undefined,
+    jornada: res?.jornada,
+    items: rawItems,
+  };
 }

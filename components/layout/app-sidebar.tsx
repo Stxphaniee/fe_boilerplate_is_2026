@@ -69,12 +69,12 @@ const captainNavigation = [
   {
     label: "Tabla de posiciones",
     icon: Trophy,
-    href: "#",
+    href: "/tabla-posiciones",
   },
   {
     label: "Pagos",
     icon: Wallet,
-    href: "#",
+    href: "/pagos/inscripcion",
   },
   {
     label: "Notificaciones",
@@ -111,12 +111,12 @@ const organizerNavigation = [
   {
     label: "Ranking",
     icon: Trophy,
-    href: "#",
+    href: "/admin/estadisticas/destacados",
   },
   {
     label: "Pagos",
     icon: Wallet,
-    href: "#",
+    href: "/admin/pagos",
   },
   {
     label: "Reportes",

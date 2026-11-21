@@ -2,6 +2,7 @@ export type MatchMediaType = "IMAGEN" | "VIDEO";
 
 export interface MatchMediaItem {
   id: string;
+  partidoId?: string;
   url: string;
   tipo: MatchMediaType;
   tamanoBytes?: number;

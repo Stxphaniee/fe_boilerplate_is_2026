@@ -1,26 +1,67 @@
+
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colores principales */
+  --background: #f5f8fc;
+  --foreground: #172b4d;
+
+  /* Identidad visual */
+  --primary: #1457c5;
+  --primary-hover: #1049a8;
+  --sidebar: #102342;
+  --sidebar-active: #294b7d;
+
+  /* Superficies */
+  --surface: #ffffff;
+  --surface-secondary: #eaf3ff;
+  --border: #d8e3f0;
+
+  /* Textos */
+  --text-primary: #172b4d;
+  --text-secondary: #7184a3;
+
+  /* Estados */
+  --success: #16834a;
+  --danger: #dc2626;
+  --warning: #d99a18;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
